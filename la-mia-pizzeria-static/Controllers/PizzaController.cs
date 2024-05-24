@@ -51,7 +51,7 @@ namespace la_mia_pizzeria_static.Controllers
 
 
 
-       // [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "ADMIN")]
         [HttpGet]
         public IActionResult Create()
         {
@@ -79,7 +79,7 @@ namespace la_mia_pizzeria_static.Controllers
 
 
 
-        //[Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "ADMIN")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(PizzeCategorie categoriepizze)
@@ -108,7 +108,6 @@ namespace la_mia_pizzeria_static.Controllers
             using (PizzeCintest db = new PizzeCintest())
             {
                 Pizze CreazionePizze = new Pizze();
-                //List<SelectListItem> Listaingredienti = new List<SelectListItem>();
                 categoriepizze.Pizze.Ingredientis = new List<Ingredienti>();    
                 if(categoriepizze.SelezionaInredienti != null )
                 {
@@ -168,7 +167,7 @@ namespace la_mia_pizzeria_static.Controllers
 
 
 
-
+        [Authorize(Roles = "ADMIN")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int Id, PizzeCategorie dati)
