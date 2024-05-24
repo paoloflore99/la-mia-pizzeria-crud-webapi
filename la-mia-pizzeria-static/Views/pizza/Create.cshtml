@@ -1,0 +1,59 @@
+﻿@using la_mia_pizzeria_static.data;
+@model PizzeCategorie
+
+
+<div class="container">
+    <form asp-controller="Pizza" asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+        <div class="mb-3">
+            <strong>Nome:</strong>
+            <input asp-for="Pizze.Nome" class="d-block w-100" />
+            <span asp-validation-for=Pizze.Nome class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <strong>Descrizione</strong>
+            <input asp-for="Pizze.Descrizione" class="d-block w-100" />
+            <span class="text-danger" asp-validation-for=Pizze.Descrizione></span>
+        </div>
+        <div class="mb-3">
+            <strong>Prezzo</strong>
+            <input asp-for="Pizze.Prezzo" class="d-block w-100" />
+            <span asp-validation-for=Pizze.Prezzo class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <strong>Foto</strong>
+            <input asp-for="Pizze.UrlFoto" class="d-block w-100" />
+            <span asp-validation-for=Pizze.UrlFoto class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <strong>categoria:</strong>
+            <select asp-for="Pizze.CategoriaId" rows="10" class="d-block w-100">
+                <option value=""></option>
+                @foreach (Categoria Categgori in Model.Categorias)
+                {
+                    @if (Model.Pizze.CategoriaId == Categgori.Id)
+                    {
+                        <option value="@Categgori.Id" selected>@Categgori.CateggoriePizze</option>
+                    }
+                    else
+                    {
+                        <option value="@Categgori.Id">@Categgori.CateggoriePizze</option>
+                    }
+                }
+            </select>
+        </div>
+        <select asp-for="SelezionaInredienti"
+                multiple="multiple"
+                size="10"
+                class="form-control mb-2 mr-sm-2 ml-sm-3 leftList"
+                asp-items="@Model.Ingredientis">
+        </select>
+
+
+
+        <div class="text-end">
+            <input type="submit" class="btn btn-small btn-info" value="pizzeinserita">
+        </div>
+    </form>
+</div>
+<a href="@Url.Action("Index", "pizza")">Torna in Home </a>

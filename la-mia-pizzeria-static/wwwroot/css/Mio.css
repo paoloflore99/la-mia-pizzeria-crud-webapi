@@ -1,0 +1,22 @@
+﻿body {
+   
+}
+
+.sfondo {
+    background-color: red;
+    background-image: url("../img/Designer.jpeg");
+    white-space:100vh;
+}
+
+.scrolla {
+    height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+
+.card {
+    margin-bottom: 20px;
+}
+
+

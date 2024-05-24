@@ -1,0 +1,36 @@
+﻿@using la_mia_pizzeria_static.data;
+@model Pizze
+
+<h4>Noeme:</h4>
+<p>@Model.Nome</p>
+<h4>Descrizione:</h4>
+<p>@Model.Descrizione</p>
+<h4>Categoria:</h4>
+<p>@Model.DammiNomeCategoria()</p>
+<h4>Ingredienti:</h4>
+@if (Model.Ingredientis != null)
+{
+    <ul>
+        @foreach (var ingrediente in Model.Ingredientis)
+        {
+            <li>@ingrediente.Name</li>
+        }
+    </ul>
+}
+else
+{
+    <p>Nessun ingrediente disponibile.</p>
+}
+
+<a href="@Url.Action("Index", "Pizza")">Torna in Home </a>
+<br />
+<a href="@Url.Action("Edit", "Pizza", new { id = Model.ID} )">Modifica</a>
+@{
+    
+    {
+        <form asp-controller="Pizza" asp-action="Delete" asp-route-id="@Model.ID" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn-danger btn-sm btn"> cancella</button>
+        </form>
+    }
+}
