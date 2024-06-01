@@ -1,18 +1,19 @@
 ﻿using la_mia_pizzeria_static.data;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using la_mia_pizzeria_static.data;
-using la_mia_pizzeria_static.Migrations;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Authorization;
-using Newtonsoft.Json.Linq;
-using static System.Net.Mime.MediaTypeNames;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using la_mia_pizzeria_static.data;
 using Microsoft.EntityFrameworkCore;
 namespace la_mia_pizzeria_static.Controllers
 {
-    public class PizzaController : Controller
+    [Route("api/PizzaApi/[action]")]
+    [ApiController]
+    public class PizzeApiController : ControllerBase
     {
 
+        //per vedere tutte le pizze e https://localhost:7064/api/PizzaApi/Index 
+        //per id  https://localhost:7064/api/PizzaApi/PerId?ID=4
 
         public IActionResult Index()
         {
@@ -40,18 +41,17 @@ namespace la_mia_pizzeria_static.Controllers
                 }
             }
 
-            return View(PizzeManager.ListaPizee() );
+            return Ok(PizzeManager.ListaPizee());
         }
 
-        public IActionResult  PerId(int ID)
+        public IActionResult PerId(int ID)
         {
-            return View(PizzeManager.GetPrendere(ID));
-            // View.Model == OggettoPassato
+            return Ok(PizzeManager.GetPrendere(ID));
+            
         }
 
 
 
-        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult Create()
         {
@@ -61,25 +61,25 @@ namespace la_mia_pizzeria_static.Controllers
                 List<Categoria> categorias = db.Categoria.ToList();
                 List<Ingredienti> ingrediti = db.Ingredientis.ToList();
                 List<SelectListItem> Listaingredienti = new List<SelectListItem>();
-                foreach(Ingredienti ingredient in ingrediti)
+                foreach (Ingredienti ingredient in ingrediti)
                 {
                     Listaingredienti.Add(new SelectListItem()
                     {
                         Text = ingredient.Name,
                         Value = ingredient.Id.ToString()
-                    });;
+                    }); ;
                 }
                 model.Ingredientis = Listaingredienti;
                 model.Categorias = categorias;
-                model.Pizze =new Pizze();
-                return View("Create", model);
+                model.Pizze = new Pizze();
+                return Ok(model);
             }
-                
+
         }
 
 
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(PizzeCategorie categoriepizze)
@@ -91,7 +91,7 @@ namespace la_mia_pizzeria_static.Controllers
                     List<SelectListItem> Listaingredienti = new List<SelectListItem>();
                     List<Ingredienti> ingrediti = db.Ingredientis.ToList();
                     List<Categoria> categorias = db.Categoria.ToList();
-                    foreach(Ingredienti ingrent in ingrediti)
+                    foreach (Ingredienti ingrent in ingrediti)
                     {
                         Listaingredienti.Add(new SelectListItem()
                         {
@@ -101,20 +101,20 @@ namespace la_mia_pizzeria_static.Controllers
                     }
                     categoriepizze.Categorias = categorias;
                     categoriepizze.Ingredientis = Listaingredienti;
-                    return View(categoriepizze);
-                }    
+                    return UnprocessableEntity(categoriepizze);
+                }
             }
 
             using (PizzeCintest db = new PizzeCintest())
             {
                 Pizze CreazionePizze = new Pizze();
-                categoriepizze.Pizze.Ingredientis = new List<Ingredienti>();    
-                if(categoriepizze.SelezionaInredienti != null )
+                categoriepizze.Pizze.Ingredientis = new List<Ingredienti>();
+                if (categoriepizze.SelezionaInredienti != null)
                 {
                     foreach (string SelezionaInredienti in categoriepizze.SelezionaInredienti)
                     {
                         Ingredienti ingredienti = db.Ingredientis.FirstOrDefault(i => i.Id.ToString() == SelezionaInredienti);
-                        if(ingredienti != null)
+                        if (ingredienti != null)
                         {
                             categoriepizze.Pizze.Ingredientis.Add(ingredienti);
                         }
@@ -137,7 +137,7 @@ namespace la_mia_pizzeria_static.Controllers
             {
 
                 Pizze Edit = db.Pizze.Where(pizze => pizze.ID == Id).FirstOrDefault();
-                if(Edit == null)
+                if (Edit == null)
                 {
                     return NotFound();
                 }
@@ -149,7 +149,7 @@ namespace la_mia_pizzeria_static.Controllers
                     model.Pizze = Edit;
                     model.Categorias = categgiria;
                     List<SelectListItem> Listaingredienti = new List<SelectListItem>();
-                    foreach(Ingredienti ingrent in ingredienti)
+                    foreach (Ingredienti ingrent in ingredienti)
                     {
                         Listaingredienti.Add(new SelectListItem()
                         {
@@ -158,22 +158,22 @@ namespace la_mia_pizzeria_static.Controllers
                         });
                     }
                     model.Ingredientis = Listaingredienti;
-                    return View(model);
+                    return Ok(model);
                 }
-            } 
+            }
         }
 
 
 
 
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int Id, PizzeCategorie dati)
         {
 
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 using (PizzeCintest db = new PizzeCintest())
                 {
@@ -192,9 +192,9 @@ namespace la_mia_pizzeria_static.Controllers
                     }
                     dati.Ingredientis = Listaingredienti;
                     dati.Categorias = categgiria;
-                    return View("Edit", dati);
+                    return UnprocessableEntity(dati);
                 }
-                
+
             }
 
             using (PizzeCintest db = new PizzeCintest())
@@ -204,7 +204,7 @@ namespace la_mia_pizzeria_static.Controllers
                 PizzeRdit.Ingredientis.Clear();
                 if (PizzeRdit != null)
                 {
-                    foreach(string selezionaIngrediente in dati.SelezionaInredienti)
+                    foreach (string selezionaIngrediente in dati.SelezionaInredienti)
                     {
                         int selezionaIngredienteId = int.Parse(selezionaIngrediente);
                         Ingredienti ingredienti = db.Ingredientis.
@@ -228,7 +228,7 @@ namespace la_mia_pizzeria_static.Controllers
         }
 
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult Delete(int id)
         {
